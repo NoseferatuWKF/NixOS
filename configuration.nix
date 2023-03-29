@@ -47,7 +47,7 @@
   services.xserver.enable = true;
 
   # Enable the XFCE Desktop Environment.
-  services.xserver.displayManager.lightdm.enable = true;
+  services.xserver.displayManager.gdm.enable = true;
   services.xserver.desktopManager.xfce.enable = false;
 
   # Configure keymap in X11
@@ -69,7 +69,6 @@
   # Enable automatic login for the user.
   services.xserver.displayManager.autoLogin.enable = true;
   services.xserver.displayManager.autoLogin.user = "noseferatu";
-
 
   # Enable CUPS to print documents.
   services.printing.enable = true;
@@ -100,22 +99,23 @@
     description = "noseferatu";
     extraGroups = [ "networkmanager" "wheel" ];
     packages = with pkgs; [
-	google-chrome
-	slack
-	spotify
-	discord
-	obsidian
-	zsh
-	go
-	rustup
-	fnm
-	nerdctl
-	temurin-jre-bin-11
-	jdk11
-	antibody
-	tmux
-	flameshot
-	containerd
+      google-chrome
+      slack
+      spotify
+      discord
+      obsidian
+      zsh
+      go
+      rustup
+      fnm
+      nerdctl
+      temurin-jre-bin-11
+      jdk11
+      antibody
+      tmux
+      flameshot
+      # kubectl
+      # kind # requires docker
     ];
   };
 
@@ -137,6 +137,10 @@
 	i3
 	picom
   ];
+
+  # virtualisation
+  # virtualisation.dockerd.enable = true;
+  virtualisation.containerd.enable = true;
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
@@ -166,4 +170,12 @@
   system.stateVersion = "22.11"; # Did you read the comment?
 
   nixpkgs.config.allowUnfree = true;
+
+  # NVIDIA
+  services.xserver.videoDrivers = [ "nvidia" ];
+  hardware.opengl.enable = true;
+
+  # wayland
+  # hardware.nvidia.modesetting.enable = true;
+
 }
