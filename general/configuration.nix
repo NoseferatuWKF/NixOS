@@ -71,7 +71,7 @@
   services.xserver.displayManager.autoLogin.user = "noseferatu";
 
   # Enable CUPS to print documents.
-  services.printing.enable = true;
+  # services.printing.enable = true;
 
   # Enable sound with pipewire.
   sound.enable = true;
@@ -87,35 +87,41 @@
 
     # use the example session manager (no others are packaged yet so this is enabled by default,
     # no need to redefine it in your config for now)
-    #media-session.enable = true;
+    # media-session.enable = true;
   };
 
   # Enable touchpad support (enabled default in most desktopManager).
   # services.xserver.libinput.enable = true;
 
+  # Enable zsh system-side to source necessary files
+  programs.zsh.enable = true;
+
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.noseferatu = {
+    shell = zsh;
     isNormalUser = true;
-    description = "noseferatu";
+    description = "whoami";
     extraGroups = [ "networkmanager" "wheel" ];
     packages = with pkgs; [
-      google-chrome
-      slack
-      spotify
-      discord
-      obsidian
-      zsh
-      go
-      rustup
-      fnm
-      nerdctl
-      temurin-jre-bin-11
-      jdk11
-      antibody
-      tmux
-      flameshot
-      # kubectl
-      # kind # requires docker
+	google-chrome
+	slack
+	spotify
+	discord
+	obsidian
+	zsh
+	go
+	rustup
+	fnm
+	nerdctl
+	temurin-jre-bin-11
+	jdk11
+	antibody
+	tmux
+	flameshot
+	picom
+	nitrogen
+	# kubectl
+	# kind # requires docker
     ];
   };
 
@@ -124,7 +130,6 @@
   environment.systemPackages = with pkgs; [
 	vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
 	wget
-	nitrogen
 	git
 	entr
 	xclip
@@ -135,11 +140,10 @@
 	bat
 	stow
 	i3
-	picom
   ];
 
   # virtualisation
-  # virtualisation.dockerd.enable = true;
+  # virtualisation.docker.enable = true;
   virtualisation.containerd.enable = true;
 
   # Some programs need SUID wrappers, can be configured further or are
@@ -167,13 +171,13 @@
   # this value at the release version of the first install of this system.
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
-  system.stateVersion = "22.11"; # Did you read the comment?
+  system.stateVersion = "22.11"; # Did you read the comment? yes I did my man :)
 
   nixpkgs.config.allowUnfree = true;
 
   # NVIDIA
-  services.xserver.videoDrivers = [ "nvidia" ];
-  hardware.opengl.enable = true;
+  # services.xserver.videoDrivers = [ "nvidia" ];
+  # hardware.opengl.enable = true;
 
   # wayland
   # hardware.nvidia.modesetting.enable = true;
