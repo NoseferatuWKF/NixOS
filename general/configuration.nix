@@ -98,7 +98,7 @@
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.noseferatu = {
-    shell = zsh;
+    shell = pkgs.zsh;
     isNormalUser = true;
     description = "whoami";
     extraGroups = [ "networkmanager" "wheel" ];
@@ -128,7 +128,8 @@
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
-	vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
+	neovim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
+	rsync
 	wget
 	git
 	entr
@@ -140,6 +141,7 @@
 	bat
 	stow
 	i3
+	ansible
   ];
 
   # virtualisation
