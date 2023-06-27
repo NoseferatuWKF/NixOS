@@ -13,17 +13,23 @@
   # Bootloader.
   boot.loader.grub.enable = true;
   boot.loader.grub.device = "/dev/sda";
-  boot.loader.grub.useOSProber = true;
+  boot.loader.grub.useOSProber = false;
 
   networking.hostName = "kubernixtes"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
+  networking.interfaces.eth0.ipv4.addresses = [ {
+    address = "10.4.20.50";
+    prefixLength = 24;
+  } ];
+  networking.defaultGateway = "10.4.20.1";
+  networking.nameservers = [ "192.168.100.1" ];
 
   # Configure network proxy if necessary
   # networking.proxy.default = "http://user:password@proxy:port/";
   # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
 
   # Enable networking
-  networking.networkmanager.enable = true;
+  # networking.networkmanager.enable = true;
 
   # Set your time zone.
   time.timeZone = "Asia/Kuala_Lumpur";
@@ -44,10 +50,10 @@
   };
 
   # Configure keymap in X11
-  services.xserver = {
-    layout = "us";
-    xkbVariant = "";
-  };
+  #services.xserver = {
+  #  layout = "us";
+  #  xkbVariant = "";
+  #};
 
   # Enable zsh system-side to source necessary files
   programs.zsh.enable = true;
@@ -57,7 +63,7 @@
     shell = pkgs.zsh;
     isNormalUser = true;
     description = "whoami";
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = [ "wheel" ];
     packages = with pkgs; [
 	zsh
 	antibody
@@ -65,6 +71,10 @@
 	go
 	kubectl
 	kind # requires docker
+	terraform
+	ansible
+	stow
+	magic-wormhole
     ];
   };
 
@@ -76,10 +86,7 @@
 	rsync
 	ripgrep
 	fzf
-	htop
-	stow
-	terraform
-	ansible
+	btop
   ];
 
   # virtualisation
