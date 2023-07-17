@@ -22,7 +22,7 @@
     prefixLength = 24;
   } ];
   networking.defaultGateway = "10.4.20.1";
-  networking.nameservers = [ "192.168.100.1" ];
+  networking.nameservers = [ "10.4.20.1" ];
 
   # Configure network proxy if necessary
   # networking.proxy.default = "http://user:password@proxy:port/";
