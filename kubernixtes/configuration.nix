@@ -17,12 +17,12 @@
 
   networking.hostName = "kubernixtes"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
-  networking.interfaces.eth0.ipv4.addresses = [ {
-    address = "10.4.20.50";
-    prefixLength = 24;
-  } ];
-  networking.defaultGateway = "10.4.20.1";
-  networking.nameservers = [ "10.4.20.1" ];
+  # networking.interfaces.eth0.ipv4.addresses = [ {
+  #   address = "10.4.20.50";
+  #   prefixLength = 24;
+  # } ];
+  networking.defaultGateway = "192.168.100.1";
+  networking.nameservers = [ "192.168.100.1" ];
 
   # Configure network proxy if necessary
   # networking.proxy.default = "http://user:password@proxy:port/";
@@ -75,6 +75,14 @@
 	ansible
 	stow
 	magic-wormhole
+	rsync
+	ripgrep
+	fzf
+	btop
+	gnumake
+	gccgo
+	cmake
+	k9s
     ];
   };
 
@@ -83,22 +91,10 @@
   environment.systemPackages = with pkgs; [
 	neovim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
 	git
-	rsync
-	ripgrep
-	fzf
-	btop
   ];
 
   # virtualisation
   virtualisation.docker.enable = true;
-
-  # Some programs need SUID wrappers, can be configured further or are
-  # started in user sessions.
-  # programs.mtr.enable = true;
-  # programs.gnupg.agent = {
-  #   enable = true;
-  #   enableSSHSupport = true;
-  # };
 
   # List services that you want to enable:
 
@@ -117,7 +113,7 @@
   # this value at the release version of the first install of this system.
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
-  system.stateVersion = "22.11"; # Did you read the comment? yes I did my man :)
+  system.stateVersion = "23.05"; # Did you read the comment? yes I did my man :)
 
   nixpkgs.config.allowUnfree = true;
 }

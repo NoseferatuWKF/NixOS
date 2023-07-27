@@ -13,24 +13,19 @@
   # Bootloader.
   boot.loader.grub.enable = true;
   boot.loader.grub.device = "/dev/sda";
-  boot.loader.grub.useOSProber = true;
+  boot.loader.grub.useOSProber = false;
 
-  # Fonts
-  fonts.fonts = with pkgs; [
-    noto-fonts-cjk
-    noto-fonts-emoji
-    (nerdfonts.override { fonts = [ "Hack" ]; })
-  ];
-
-  networking.hostName = "nixos"; # Define your hostname.
+  networking.hostName = "grafanix"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
+  networking.defaultGateway = "192.168.100.1";
+  networking.nameservers = [ "192.168.100.1" ];
 
   # Configure network proxy if necessary
   # networking.proxy.default = "http://user:password@proxy:port/";
   # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
 
   # Enable networking
-  networking.networkmanager.enable = true;
+  # networking.networkmanager.enable = true;
 
   # Set your time zone.
   time.timeZone = "Asia/Kuala_Lumpur";
@@ -50,55 +45,11 @@
     LC_TIME = "ms_MY.UTF-8";
   };
 
-  # Enable the X11 windowing system.
-  services.xserver.enable = true;
-
-  # Enable the XFCE Desktop Environment.
-  services.xserver.displayManager.gdm.enable = true;
-  services.xserver.desktopManager.xfce.enable = false;
-
   # Configure keymap in X11
-  services.xserver = {
-    layout = "us";
-    xkbVariant = "";
-    windowManager.i3 = {
-      enable = true;
-      extraPackages = with pkgs; [
-	dmenu
-	i3status
-      ];
-    };
-  };
-
-  # i3
-  services.xserver.displayManager.defaultSession = "none+i3";
-
-  # Enable automatic login for the user.
-  services.xserver.displayManager.autoLogin.enable = true;
-  services.xserver.displayManager.autoLogin.user = "noseferatu";
-
-  # Enable CUPS to print documents.
-  # services.printing.enable = true;
-
-  # Enable sound with pipewire.
-  sound.enable = true;
-  hardware.pulseaudio.enable = false;
-  security.rtkit.enable = true;
-  services.pipewire = {
-    enable = true;
-    alsa.enable = true;
-    alsa.support32Bit = true;
-    pulse.enable = true;
-    # If you want to use JACK applications, uncomment this
-    #jack.enable = true;
-
-    # use the example session manager (no others are packaged yet so this is enabled by default,
-    # no need to redefine it in your config for now)
-    # media-session.enable = true;
-  };
-
-  # Enable touchpad support (enabled default in most desktopManager).
-  # services.xserver.libinput.enable = true;
+  #services.xserver = {
+  #  layout = "us";
+  #  xkbVariant = "";
+  #};
 
   # Enable zsh system-side to source necessary files
   programs.zsh.enable = true;
@@ -108,27 +59,21 @@
     shell = pkgs.zsh;
     isNormalUser = true;
     description = "whoami";
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = [ "wheel" ];
     packages = with pkgs; [
-	google-chrome
-	slack
-	spotify
-	discord
-	obsidian
 	zsh
-	go
-	rustup
-	fnm
-	nerdctl
-	temurin-jre-bin-11
-	jdk11
 	antibody
 	tmux
-	flameshot
-	picom
-	nitrogen
-	# kubectl
-	# kind # requires docker
+	ansible
+	stow
+	magic-wormhole
+	rsync
+	ripgrep
+	fzf
+	btop
+	gnumake
+	gccgo
+	cmake
     ];
   };
 
@@ -136,40 +81,55 @@
   # $ nix search wget
   environment.systemPackages = with pkgs; [
 	neovim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
-	rsync
-	wget
 	git
-	entr
-	xclip
-	ripgrep
-	fzf
-	htop
-	tree
-	bat
-	stow
-	i3
-	ansible
   ];
 
   # virtualisation
-  # virtualisation.docker.enable = true;
-  virtualisation.containerd.enable = true;
-
-  # Some programs need SUID wrappers, can be configured further or are
-  # started in user sessions.
-  # programs.mtr.enable = true;
-  # programs.gnupg.agent = {
-  #   enable = true;
-  #   enableSSHSupport = true;
-  # };
+  # virtualisation.containerd.enable = true;
 
   # List services that you want to enable:
 
   # Enable the OpenSSH daemon.
   services.openssh.enable = true;
 
+  services.grafana = {
+    enable = true;
+    settings = {
+      server = {
+	http_addr = "127.0.0.1";
+	http_port = 3000;
+	domain = "noseferatu.monitoring";
+	root_url = "http://${toString config.services.grafana.settings.server.domain}/grafana";
+      };
+    };
+  };
+
+  services.victoriametrics.enable = true;
+
+  services.nginx = {
+    enable = true;
+    virtualHosts.${config.services.grafana.settings.server.domain}= {
+      locations = {
+	"/grafana/" = {
+	  proxyPass = "http://${toString config.services.grafana.settings.server.http_addr}:${toString config.services.grafana.settings.server.http_port}/";
+	  proxyWebsockets = true;
+	  extraConfig = 
+	    "proxy_set_header Host $host;"
+	    ;
+	};
+	"/victoriametrics/" = {
+	  proxyPass = "http://${toString config.services.grafana.settings.server.http_addr}:8428/";
+	  proxyWebsockets = true;
+	};
+      };
+    };
+  };
+
   # Open ports in the firewall.
-  # networking.firewall.allowedTCPPorts = [ ... ];
+  networking.firewall = {
+    enable = true;
+    allowedTCPPorts = [ 80 443 ];
+  };
   # networking.firewall.allowedUDPPorts = [ ... ];
   # Or disable the firewall altogether.
   # networking.firewall.enable = false;
@@ -183,12 +143,4 @@
   system.stateVersion = "23.05"; # Did you read the comment? yes I did my man :)
 
   nixpkgs.config.allowUnfree = true;
-
-  # NVIDIA
-  # services.xserver.videoDrivers = [ "nvidia" ];
-  # hardware.opengl.enable = true;
-
-  # wayland
-  # hardware.nvidia.modesetting.enable = true;
-
 }
